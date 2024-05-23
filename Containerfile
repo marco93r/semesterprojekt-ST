@@ -1,5 +1,4 @@
-# Import the base image as UBI-Nodejs 18 image
-FROM registry.access.redhat.com/ubi8/nodejs-18:latest
+FROM zodern/meteor:latest
 
 # Set path for meteor cli 
 ENV PATH=$PATH:$HOME/.meteor
