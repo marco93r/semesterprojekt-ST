@@ -1,35 +1,36 @@
-FROM zodern/meteor:latest
+FROM node:18
 
-# Set path for meteor cli 
-ENV PATH=$PATH:$HOME/.meteor
+# Environment variables
+ENV METEOR_ALLOW_SUPERUSER=true
+ENV ROOT_URL="http://localhost:3000"
 
-# Create a user
-USER default
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libstdc++6
 
-# Installation of meteor cli
+# Verify the version of libstdc++ to ensure it includes the required GLIBCXX_3.4.26
+RUN strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
+
+# Install Meteor
 RUN curl "https://install.meteor.com/" | sh
 
-# Set the working directory to /opt/app-root/src/app
-WORKDIR /opt/app-root/src/app
+# Set the working directory
+WORKDIR /usr/src/app
 
-# Add application files in container with permissions
-COPY --chown=default:0 . .
+# Copy the app's source code into the container
+COPY . /usr/src/app
 
-# Install all Meteor dependacies
+# Set permissions for the local Meteor directory
+RUN chmod -R 700 /usr/src/app/.meteor/local
+
+# Install app dependencies
 RUN meteor npm install
 
-# Set permission of files in container
-USER root
-RUN chmod -R 775 /opt/app-root/src/.meteor
-RUN chown -R default:0 /opt/app-root/src/.meteor
-RUN chmod -R 775 /opt/app-root/src/app/.meteor
-RUN chown -R default:0 /opt/app-root/src/app/.meteor
-RUN chmod -R 775 /opt/app-root/src/.npm/
-RUN chown -R default:0 /opt/app-root/src/.npm/
-USER default
+RUN npm install babel-eslint ajv
 
-# Open port to allow traffic in container
+# Expose the necessary port
 EXPOSE 3000
 
-# Run start script using npm command
+# Start the app
 CMD ["npm", "start"]
