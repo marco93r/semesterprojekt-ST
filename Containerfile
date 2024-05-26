@@ -22,7 +22,7 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app
 
 # Set permissions for the local Meteor directory
-RUN chmod -R 700 /usr/src/app/.meteor/local
+#RUN chmod -R 700 /usr/src/app/.meteor/local
 
 # Install app dependencies
 RUN meteor npm install
